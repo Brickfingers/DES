@@ -59,6 +59,36 @@ int state_table[][NUM_STATES] = {
     /* 11 GUARD_RIGHT_LOCK  */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
     /* 12 EXIT              */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS} };
 
+typedef int (*PTR_AAF)(int input);
+
+int idle(int input);
+int left_scan(int input);
+int right_scan(int input);
+int guard_left_unlock(int input);
+int guard_right_unlock(int input);
+int left_open(int input);
+int right_open(int input);
+int weight_scale(int input);
+int left_closed(int input);
+int right_closed(int input);
+int guard_left_lock(int input);
+int guard_right_lock(int input);
+
+PTR_AAF fp_table[12] = {
+		idle,
+		left_scan,
+		right_scan,
+		guard_left_unlock,
+		guard_right_unlock,
+		left_open,
+		right_open,
+		weight_scale,
+		left_closed,
+		right_closed,
+		guard_left_lock,
+		guard_right_lock
+};
+
 typedef enum {
 	//assign an enum value, one for each input command
 	LEFT_SCAN = 0,
