@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
 
 		//get message
 		rcvid = MsgReceive(chid, &person_message, sizeof(person_message), NULL);
-
+		printf("56");
 		if (rcvid == -1) {
 			fprintf(stderr, "MsgReceive error.\n");
 			exit(EXIT_FAILURE);
@@ -66,14 +66,19 @@ int main(int argc, char* argv[]) {
 				index = i;
 			}
 		}
-
+		printf("69");
 		int next;
 		//TODO - get input event from Person object and advance state machine to next accepting state (or error state)
 
 		next = state_table[person_message.state][index];
 
-		//call the function
+		person_message.state = next;
 
+		if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+			fprintf(stderr, "MsgSend had an error\n");
+			perror(EXIT_FAILURE);
+		}
+		printf("81");
 		//Reference - your CST8152 - Compiler notes (***)
 		// use function pointers
 		//TODO - complete rest of Phase II for controller
