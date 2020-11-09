@@ -60,7 +60,17 @@ int main(void) {
 		}
 		MsgReply(rcvid, EOK, NULL, 0);
 
+		int index = -1;
+		for (int i = 0; i < NUM_INPUTS; i++){
+			if (strcmp(&person_message, inMessage[i]) == 0) {
+				index = i;
+			}
+		}
+
+		int next;
 		//TODO - get input event from Person object and advance state machine to next accepting state (or error state)
+
+		next = fp_table[state_table[person_message.state][inMessage[i]]];
 
 		//Reference - your CST8152 - Compiler notes (***)
 		// use function pointers
@@ -80,7 +90,7 @@ int idle(int input) {
 		perror(EXIT_FAILURE);
 	}
 	if(state_table[person.state][input] != IS) {
-		return af_table[state_table[person.state][input]];
+		return state_table[person.state][input];
 	}
 };
 
@@ -90,7 +100,7 @@ int left_scan(int input){
 		perror(EXIT_FAILURE);
 	}
 	if(state_table[person.state][input] != IS) {
-		return af_table[state_table[person.state][input]];
+		return state_table[person.state][input];
 	}
 };
 
@@ -100,7 +110,7 @@ int right_scan(int input) {
 		perror(EXIT_FAILURE);
 	}
 	if(state_table[person.state][input] != IS) {
-		return af_table[state_table[person.state][input]];
+		return state_table[person.state][input];
 	}
 };
 
@@ -110,7 +120,7 @@ int guard_left_unlock(int input){
 		perror(EXIT_FAILURE);
 	}
 	if(state_table[person.state][input] != IS) {
-		return af_table[state_table[person.state][input]];
+		return state_table[person.state][input];
 	}
 };
 
@@ -120,7 +130,7 @@ int guard_right_unlock(int input) {
 		perror(EXIT_FAILURE);
 	}
 	if(state_table[person.state][input] != IS) {
-		return af_table[state_table[person.state][input]];
+		return state_table[person.state][input];
 	}
 };
 
@@ -131,7 +141,7 @@ int left_open(){
 		perror(EXIT_FAILURE);
 	}
 	if(state_table[person.state][input] != IS) {
-		return af_table[state_table[person.state][input]];
+		return state_table[person.state][input];
 	}
 };
 
