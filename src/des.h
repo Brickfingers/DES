@@ -26,83 +26,37 @@
 //From the assignment specification, notice the prompt.
 //Each command, ls, rs, etc.
 
-typedef enum {
+typedef enum State{
 	//assign an enum value, one for each state
-	IDLE = 0,
-    LEFT_SCAN = 1,
-    RIGHT_SCAN = 2,
-    GUARD_LEFT_UNLOCK = 3,
-    GUARD_RIGHT_UNLOCK = 4,
-    LEFT_OPEN = 5,
-    RIGHT_OPEN = 6,
-    WEIGHT_SCALE = 7,
-    LEFT_CLOSED = 8,
-    RIGHT_CLOSED = 9,
-    GUARD_LEFT_LOCK = 10,
-    GUARD_RIGHT_LOCK = 11,
-	EXIT = 12
+	IDLE_STATE = 0,
+    LEFT_SCAN_STATE = 1,
+    RIGHT_SCAN_STATE = 2,
+    GUARD_LEFT_UNLOCK_STATE = 3,
+    GUARD_RIGHT_UNLOCK_STATE = 4,
+    LEFT_OPEN_STATE = 5,
+    RIGHT_OPEN_STATE = 6,
+    WEIGHT_SCALE_STATE = 7,
+    LEFT_CLOSED_STATE = 8,
+    RIGHT_CLOSED_STATE = 9,
+    GUARD_LEFT_LOCK_STATE = 10,
+    GUARD_RIGHT_LOCK_STATE = 11,
+	EXIT_STATE = 12
 } State;
-
-int state_table[][NUM_STATES] = {
-    /*                           ls,  rs, glu, gru,  lo,  ro,  ws,  lc,  rc, gll, grl, exit*/
-    /* 0 IDLE               */ {  1,   2,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 1 LEFT_SCAN          */ { IS,  IS,   3,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 2 RIGHT_SCAN         */ { IS,  IS,  IS,   4,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 3 GUARD_LEFT_UNLOCK  */ { IS,  IS,  IS,  IS,   5,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 4 GUARD_RIGHT_UNLOCK */ { IS,  IS,  IS,  IS,  IS,   6,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 5 LEFT_OPEN          */ { IS,  IS,  IS,  IS,  IS,  IS,   7,   8,  IS,  IS,  IS,  12},
-    /* 6 RIGHT_OPEN         */ { IS,  IS,  IS,  IS,  IS,  IS,   7,  IS,   9,  IS,  IS,  12},
-    /* 7 WEIGHT_SCALE       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,   8,   9,  IS,  IS,  12},
-    /* 8 LEFT_CLOSED        */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  IS,  12},
-    /* 9 RIGHT_CLOSED       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  12},
-    /* 10 GUARD_LEFT_LOCK   */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
-    /* 11 GUARD_RIGHT_LOCK  */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
-    /* 12 EXIT              */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS} };
-
-typedef int (*PTR_AAF)(int input);
-
-int idle(int input);
-int left_scan(int input);
-int right_scan(int input);
-int guard_left_unlock(int input);
-int guard_right_unlock(int input);
-int left_open(int input);
-int right_open(int input);
-int weight_scale(int input);
-int left_closed(int input);
-int right_closed(int input);
-int guard_left_lock(int input);
-int guard_right_lock(int input);
-
-PTR_AAF fp_table[12] = {
-		idle,
-		left_scan,
-		right_scan,
-		guard_left_unlock,
-		guard_right_unlock,
-		left_open,
-		right_open,
-		weight_scale,
-		left_closed,
-		right_closed,
-		guard_left_lock,
-		guard_right_lock
-};
 
 typedef enum {
 	//assign an enum value, one for each input command
-	LEFT_SCAN = 0,
-	RIGHT_SCAN = 1,
-	GUARD_LEFT_UNLOCK = 2,
-	GUARD_RIGHT_UNLOCK = 3,
-	LEFT_OPEN = 4,
-	RIGHT_OPEN = 5,
-	WEIGHED = 6,
-	LEFT_CLOSE = 7,
-	RIGHT_CLOSE = 8,
-	GUARD_LEFT_LOCK = 9,
-	GUARD_RIGHT_LOCK = 10,
-	EXIT = 11
+	LS = 0,
+	RS = 1,
+	GLU = 2,
+	GRU = 3,
+	LLO = 4,
+	RO = 5,
+	WS = 6,
+	LC = 7,
+	RC = 8,
+	GLL = 9,
+	GRL = 10,
+	EX = 11
 } Input;
 
 const char *inMessage[NUM_INPUTS] = {
@@ -162,7 +116,7 @@ typedef struct {
 	char input[64];
 	int weight;
 	int direction;
-	State state;
+	int state;
 } Person;
 
 // controller client sends a Display struct to its server, the display
@@ -176,5 +130,51 @@ typedef struct {
 	int output;
 	Person person;
 } Display;
+
+int state_table[][NUM_STATES] = {
+    /*                           ls,  rs, glu, gru,  lo,  ro,  ws,  lc,  rc, gll, grl, exit*/
+    /* 0 IDLE               */ {  1,   2,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 1 LEFT_SCAN          */ { IS,  IS,   3,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 2 RIGHT_SCAN         */ { IS,  IS,  IS,   4,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 3 GUARD_LEFT_UNLOCK  */ { IS,  IS,  IS,  IS,   5,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 4 GUARD_RIGHT_UNLOCK */ { IS,  IS,  IS,  IS,  IS,   6,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 5 LEFT_OPEN          */ { IS,  IS,  IS,  IS,  IS,  IS,   7,   8,  IS,  IS,  IS,  12},
+    /* 6 RIGHT_OPEN         */ { IS,  IS,  IS,  IS,  IS,  IS,   7,  IS,   9,  IS,  IS,  12},
+    /* 7 WEIGHT_SCALE       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,   8,   9,  IS,  IS,  12},
+    /* 8 LEFT_CLOSED        */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  IS,  12},
+    /* 9 RIGHT_CLOSED       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  12},
+    /* 10 GUARD_LEFT_LOCK   */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
+    /* 11 GUARD_RIGHT_LOCK  */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
+    /* 12 EXIT              */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS} };
+
+typedef int (*PTR_AAF)(int input, int coid, Display msg_send, Person person);
+
+int idle(int input, int coid, Display msg_send, Person person);
+int left_scan(int input, int coid, Display msg_send, Person person);
+int right_scan(int input, int coid, Display msg_send, Person person);
+int guard_left_unlock(int input, int coid, Display msg_send, Person person);
+int guard_right_unlock(int input, int coid, Display msg_send, Person person);
+int left_open(int input, int coid, Display msg_send, Person person);
+int right_open(int input, int coid, Display msg_send, Person person);
+int weight_scale(int input, int coid, Display msg_send, Person person);
+int left_closed(int input, int coid, Display msg_send, Person person);
+int right_closed(int input, int coid, Display msg_send, Person person);
+int guard_left_lock(int input, int coid, Display msg_send, Person person);
+int guard_right_lock(int input, int coid, Display msg_send, Person person);
+
+PTR_AAF fp_table[12] = {
+		idle,
+		left_scan,
+		right_scan,
+		guard_left_unlock,
+		guard_right_unlock,
+		left_open,
+		right_open,
+		weight_scale,
+		left_closed,
+		right_closed,
+		guard_left_lock,
+		guard_right_lock
+};
 
 #endif /* DOOR_ENTRY_SYSTEM_H_ */

@@ -6,7 +6,7 @@
 
 #include "des.h"
 
-int main(void) {
+int main(int argc, char* argv[]) {
 
 	//des_display = server
 	Display msg_send;
@@ -49,7 +49,7 @@ int main(void) {
 	//PHASE II receive message & process message
 	//SERVER WAIT FOR MESSAGE -> pass on to client
 
-	while (TRUE) {
+	while (1) {
 
 		//get message
 		rcvid = MsgReceive(chid, &person_message, sizeof(person_message), NULL);
@@ -70,7 +70,9 @@ int main(void) {
 		int next;
 		//TODO - get input event from Person object and advance state machine to next accepting state (or error state)
 
-		next = fp_table[state_table[person_message.state][inMessage[i]]];
+		next = state_table[person_message.state][index];
+
+		//call the function
 
 		//Reference - your CST8152 - Compiler notes (***)
 		// use function pointers
@@ -84,7 +86,7 @@ int main(void) {
 	exit(EXIT_SUCCESS);
 }
 
-int idle(int input) {
+int idle(int input, int coid, Display msg_send, Person person) {
 	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(EXIT_FAILURE);
@@ -92,9 +94,10 @@ int idle(int input) {
 	if(state_table[person.state][input] != IS) {
 		return state_table[person.state][input];
 	}
-};
+	return -1;
+}
 
-int left_scan(int input){
+int left_scan(int input, int coid, Display msg_send, Person person){
 	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(EXIT_FAILURE);
@@ -102,9 +105,10 @@ int left_scan(int input){
 	if(state_table[person.state][input] != IS) {
 		return state_table[person.state][input];
 	}
-};
+	return -1;
+}
 
-int right_scan(int input) {
+int right_scan(int input, int coid, Display msg_send, Person person) {
 	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(EXIT_FAILURE);
@@ -112,9 +116,10 @@ int right_scan(int input) {
 	if(state_table[person.state][input] != IS) {
 		return state_table[person.state][input];
 	}
-};
+	return -1;
+}
 
-int guard_left_unlock(int input){
+int guard_left_unlock(int input, int coid, Display msg_send, Person person){
 	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(EXIT_FAILURE);
@@ -122,9 +127,10 @@ int guard_left_unlock(int input){
 	if(state_table[person.state][input] != IS) {
 		return state_table[person.state][input];
 	}
-};
+	return -1;
+}
 
-int guard_right_unlock(int input) {
+int guard_right_unlock(int input, int coid, Display msg_send, Person person) {
 	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(EXIT_FAILURE);
@@ -132,10 +138,11 @@ int guard_right_unlock(int input) {
 	if(state_table[person.state][input] != IS) {
 		return state_table[person.state][input];
 	}
-};
+	return -1;
+}
 
 
-int left_open(){
+int left_open(int input, int coid, Display msg_send, Person person){
 	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(EXIT_FAILURE);
@@ -143,7 +150,5 @@ int left_open(){
 	if(state_table[person.state][input] != IS) {
 		return state_table[person.state][input];
 	}
-};
-
-
-
+	return -1;
+}
