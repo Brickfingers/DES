@@ -43,18 +43,18 @@ typedef enum {
 
 typedef enum {
 	//assign an enum value, one for each input command
-	LS = 0,
-	RS = 1,
-	GLU = 2,
-	GRU = 3,
-	LO = 4,
-	RO = 5,
-	WS = 6,
-	LC = 7,
-	RC = 8,
-	GLL = 9,
-	GRL = 10,
-	EXIT = 11,
+	LEFT_SCAN = 0,
+	RIGHT_SCAN = 1,
+	GUARD_LEFT_UNLOCK = 2,
+	GUARD_RIGHT_UNLOCK = 3,
+	LEFT_OPEN = 4,
+	RIGHT_OPEN = 5,
+	WEIGHED = 6,
+	LEFT_CLOSE = 7,
+	RIGHT_CLOSE = 8,
+	GUARD_LEFT_LOCK = 9,
+	GUARD_RIGHT_LOCK = 10,
+	EXIT = 11
 } Input;
 
 const char *inMessage[NUM_INPUTS] = {
@@ -77,15 +77,15 @@ const char *inMessage[NUM_INPUTS] = {
 typedef enum {
 	//assign an enum value, one for each output message from the FSM
 	ID_SCAN = 0,
-	GLU = 1,
-	GRU = 2,
-	LO = 3,
-	RO = 4,
+	GUARD_LEFT_UNLOCK = 1,
+	GUARD_RIGHT_UNLOCK = 2,
+	LEFT_OPEN = 3,
+	RIGHT_OPEN = 4,
 	WEIGHED = 5,
-	LC = 6,
-	RC = 7,
-	GLL = 8,
-	GRL = 9,
+	LEFT_CLOSE = 6,
+	RIGHT_CLOSE = 7,
+	GUARD_LEFT_LOCK = 8,
+	GUARD_RIGHT_LOCK = 9,
 	EXIT = 10
 } Output;
 
@@ -111,6 +111,7 @@ typedef struct {
 	//what state the Person is in. Suppose the Person in
 	//"Left Scan" state. You need a way to represent that.
 	int id;
+	char input[64];
 	int weight;
 	int direction;
 	State state;

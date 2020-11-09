@@ -8,28 +8,21 @@
 
 int main(void) {
 
-	client_send_t msg_send;
-	server_response_t msg_receive;
+	//des_display = server
+	Display msg_send;
+	Display msg_receive;
 	pid_t serverpid;
 	int coid;
 
-	client_send_t client_message;
-	server_response_t response;
+	//des_inputs = client
+	Person person_message;
 	int rcvid;
 	int chid;
 
-	//SERVER SETUP
+	//Phase I
 
-	chid = ChannelCreate(0);
-	if (chid == -1) {
-		fprintf(stderr, "ChannelCreate failure.\n");
-		exit(EXIT_FAILURE);
-	}
-	printf("controller PID is %d\tAnd the Channel ID (chid) is: %d\n", getpid(),
-			chid);
-
-	//CLIENT SETUP
-
+	//Get controller's PID from command-line arguments.
+	serverpid = atoi(argv[1]);
 	//On Failure: print usage message and EXIT_FAILURE
 	if (argc != 2) {
 		//print usage message
@@ -37,9 +30,12 @@ int main(void) {
 				"Usage: ./des_inputs <pid of des_display> <enter>\n");
 		exit(EXIT_FAILURE);
 	}
-	//Phase I
-	//Get controller's PID from command-line arguments.
-	serverpid = atoi(argv[1]);
+
+	chid = ChannelCreate(0);
+	if (chid == -1) {
+		fprintf(stderr, "ChannelCreate failure.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	coid = ConnectAttach(ND_LOCAL_NODE, serverpid, 1, _NTO_SIDE_CHANNEL, 0);
 	if (coid == -1) {
@@ -47,21 +43,28 @@ int main(void) {
 		exit(EXIT_FAILURE);
 	}
 
+	printf("controller PID is %d\tAnd the Channel ID (chid) is: %d\n", getpid(),
+			chid);
+
 	//PHASE II receive message & process message
 	//SERVER WAIT FOR MESSAGE -> pass on to client
 
-	while (1) {
+	while (TRUE) {
 
 		//get message
-		rcvid = MsgReceive(chid, &client_message, sizeof(client_message), NULL);
+		rcvid = MsgReceive(chid, &person_message, sizeof(person_message), NULL);
 
 		if (rcvid == -1) {
 			fprintf(stderr, "MsgReceive error.\n");
 			exit(EXIT_FAILURE);
 		}
+		MsgReply(rcvid, EOK, NULL, 0);
 
-		//do stuff
-		//pass on message to des_display
+		//TODO - get input event from Person object and advance state machine to next accepting state (or error state)
+
+		//Reference - your CST8152 - Compiler notes (***)
+		// use function pointers
+		//TODO - complete rest of Phase II for controller
 
 	}
 
