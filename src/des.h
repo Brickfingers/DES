@@ -22,8 +22,7 @@
 
 #define NUM_STATES n	// where n = number of states in your finite state machine (FSM)
 typedef enum {
-	//TODO :: to see the list of //TODOS, Window > Show View > Tasks
-	//TODO :: assign an enum value, one for each state
+	//assign an enum value, one for each state
     LEFT_SCAN = 0,
     RIGHT_SCAN = 1,
     WEIGHT_SCALE = 2,
@@ -34,14 +33,16 @@ typedef enum {
     GUARD_LEFT_UNLOCK = 7,
     GUARD_RIGHT_UNLOCK = 8,
     GUARD_LEFT_LOCK = 9,
-    GUARD_RIGHT_LOCK = 10
+    GUARD_RIGHT_LOCK = 10,
+	IDLE = 11
 } State;
 
 #define NUM_INPUTS 12	// where n equals the number of input commands that drive the FSM.
-			// From the assignment specification, notice the prompt. Each command, ls, rs, etc.
+//From the assignment specification, notice the prompt.
+//Each command, ls, rs, etc.
 
 typedef enum {
-	//TODO :: assign an enum value, one for each input command
+	//assign an enum value, one for each input command
 	LS = 0,
 	RS = 1,
 	GLU = 2,
@@ -57,7 +58,7 @@ typedef enum {
 } Input;
 
 const char *inMessage[NUM_INPUTS] = {
-	//TODO :: each input command. For example, "ls"
+	//each input command. For example, "ls"
 	"ls",
 	"rs",
 	"glu",
@@ -74,13 +75,13 @@ const char *inMessage[NUM_INPUTS] = {
 
 #define NUM_OUTPUTS 11	// where n equals the number of output messages from the FSM.
 typedef enum {
-	//TODO :: assign an enum value, one for each output message from the FSM
-	PS = 0,
+	//assign an enum value, one for each output message from the FSM
+	ID_SCAN = 0,
 	GLU = 1,
 	GRU = 2,
 	LO = 3,
 	RO = 4,
-	PW = 5,
+	WEIGHED = 5,
 	LC = 6,
 	RC = 7,
 	GLL = 8,
@@ -89,7 +90,7 @@ typedef enum {
 } Output;
 
 const char *outMessage[NUM_OUTPUTS] = {
-	//TODO :: each output message. For example, "Person opened left door"
+	//each output message. For example, "Person opened left door"
     "Person scanned ID, ID: =",
     "Guard left door unlocked.",
     "Guard right door unlocked.",
@@ -105,19 +106,26 @@ const char *outMessage[NUM_OUTPUTS] = {
 
 // inputs client sends a Person struct to its server, the controller
 typedef struct {
-	//TODO :: fields for person's ID (int), weight (int), direction (inbound or outbound),
-	//	and some way to remember what state the Person is in. Suppose the Person in "Left Scan" state.
-	//	You need a way to represent that.
+	//TODO :: fields for person's ID (int), weight (int),
+	//direction (inbound or outbound), and some way to remember
+	//what state the Person is in. Suppose the Person in
+	//"Left Scan" state. You need a way to represent that.
 	int id;
 	int weight;
+	int direction;
+	State state;
 } Person;
 
 // controller client sends a Display struct to its server, the display
 typedef struct {
-	//TODO :: fields for the output message and the Person. For the output message, I used an int, which
-	//	is the index into the outMessages array. That way I don't pass strings in my messages.
-	//	The Person field is needed, as some output message require information from the Person.
-	//	Specifically, those messages that display the Person's ID and weight.
+	//fields for the output message and the Person.
+	//For the output message, I used an int, which is the index
+	//into the outMessages array. That way I don't pass strings
+	//in my messages. The Person field is needed, as some output
+	//message require information from the Person. Specifically,
+	//those messages that display the Person's ID and weight.
+	int output;
+	Person person;
 } Display;
 
 #endif /* DOOR_ENTRY_SYSTEM_H_ */
