@@ -20,26 +20,44 @@
 #include <string.h>
 #include <unistd.h>
 
-#define NUM_STATES n	// where n = number of states in your finite state machine (FSM)
-typedef enum {
-	//assign an enum value, one for each state
-    LEFT_SCAN = 0,
-    RIGHT_SCAN = 1,
-    WEIGHT_SCALE = 2,
-    LEFT_OPEN = 3,
-    RIGHT_OPEN = 4,
-    LEFT_CLOSED = 5,
-    RIGHT_CLOSED = 6,
-    GUARD_LEFT_UNLOCK = 7,
-    GUARD_RIGHT_UNLOCK = 8,
-    GUARD_LEFT_LOCK = 9,
-    GUARD_RIGHT_LOCK = 10,
-	IDLE = 11
-} State;
-
+#define NUM_STATES 13	// where n = number of states in your finite state machine (FSM)
+#define IS -1 //invalid state
 #define NUM_INPUTS 12	// where n equals the number of input commands that drive the FSM.
 //From the assignment specification, notice the prompt.
 //Each command, ls, rs, etc.
+
+typedef enum {
+	//assign an enum value, one for each state
+	IDLE = 0,
+    LEFT_SCAN = 1,
+    RIGHT_SCAN = 2,
+    GUARD_LEFT_UNLOCK = 3,
+    GUARD_RIGHT_UNLOCK = 4,
+    LEFT_OPEN = 5,
+    RIGHT_OPEN = 6,
+    WEIGHT_SCALE = 7,
+    LEFT_CLOSED = 8,
+    RIGHT_CLOSED = 9,
+    GUARD_LEFT_LOCK = 10,
+    GUARD_RIGHT_LOCK = 11,
+	EXIT = 12
+} State;
+
+int state_table[][NUM_STATES] = {
+    /*                           ls,  rs, glu, gru,  lo,  ro,  ws,  lc,  rc, gll, grl, exit*/
+    /* 0 IDLE               */ {  1,   2,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 1 LEFT_SCAN          */ { IS,  IS,   3,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 2 RIGHT_SCAN         */ { IS,  IS,  IS,   4,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 3 GUARD_LEFT_UNLOCK  */ { IS,  IS,  IS,  IS,   5,  IS,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 4 GUARD_RIGHT_UNLOCK */ { IS,  IS,  IS,  IS,  IS,   6,  IS,  IS,  IS,  IS,  IS,  12},
+    /* 5 LEFT_OPEN          */ { IS,  IS,  IS,  IS,  IS,  IS,   7,   8,  IS,  IS,  IS,  12},
+    /* 6 RIGHT_OPEN         */ { IS,  IS,  IS,  IS,  IS,  IS,   7,  IS,   9,  IS,  IS,  12},
+    /* 7 WEIGHT_SCALE       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,   8,   9,  IS,  IS,  12},
+    /* 8 LEFT_CLOSED        */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  IS,  12},
+    /* 9 RIGHT_CLOSED       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  12},
+    /* 10 GUARD_LEFT_LOCK   */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
+    /* 11 GUARD_RIGHT_LOCK  */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
+    /* 12 EXIT              */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS} };
 
 typedef enum {
 	//assign an enum value, one for each input command
@@ -97,8 +115,8 @@ const char *outMessage[NUM_OUTPUTS] = {
     "Person opened left door",
     "Person opened right door.",
     "Person weighed, weight =",
-    "Left door closed",
-    "Right door closed",
+    "Left door closed (Automatically)",
+    "Right door closed (Automatically)",
     "Guard left door locked.",
     "Guard right door locked.",
     "Exiting"
