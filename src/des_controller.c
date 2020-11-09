@@ -73,3 +73,67 @@ int main(void) {
 	ConnectDetach(coid);
 	exit(EXIT_SUCCESS);
 }
+
+int idle(int input) {
+	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+		fprintf(stderr, "MsgSend had an error\n");
+		perror(EXIT_FAILURE);
+	}
+	if(state_table[person.state][input] != IS) {
+		return af_table[state_table[person.state][input]];
+	}
+};
+
+int left_scan(int input){
+	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+		fprintf(stderr, "MsgSend had an error\n");
+		perror(EXIT_FAILURE);
+	}
+	if(state_table[person.state][input] != IS) {
+		return af_table[state_table[person.state][input]];
+	}
+};
+
+int right_scan(int input) {
+	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+		fprintf(stderr, "MsgSend had an error\n");
+		perror(EXIT_FAILURE);
+	}
+	if(state_table[person.state][input] != IS) {
+		return af_table[state_table[person.state][input]];
+	}
+};
+
+int guard_left_unlock(int input){
+	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+		fprintf(stderr, "MsgSend had an error\n");
+		perror(EXIT_FAILURE);
+	}
+	if(state_table[person.state][input] != IS) {
+		return af_table[state_table[person.state][input]];
+	}
+};
+
+int guard_right_unlock(int input) {
+	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+		fprintf(stderr, "MsgSend had an error\n");
+		perror(EXIT_FAILURE);
+	}
+	if(state_table[person.state][input] != IS) {
+		return af_table[state_table[person.state][input]];
+	}
+};
+
+
+int left_open(){
+	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+		fprintf(stderr, "MsgSend had an error\n");
+		perror(EXIT_FAILURE);
+	}
+	if(state_table[person.state][input] != IS) {
+		return af_table[state_table[person.state][input]];
+	}
+};
+
+
+
