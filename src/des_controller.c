@@ -70,9 +70,9 @@ int main(int argc, char* argv[]) {
 
 		//TODO - get input event from Person object and advance state machine to next accepting state (or error state)
 
-		if (person_message.state == IDLE_STATE){
-			printf("Waiting for Person...\n");
-		}
+//		if (person_message.state == IDLE_STATE){
+//			printf("Waiting for Person...\n");
+//		}
 
 		//get message
 		rcvid = MsgReceive(chid, &person_message, sizeof(person_message), NULL);
@@ -101,6 +101,7 @@ int main(int argc, char* argv[]) {
 }
 
 void sendDisplay(Output* output, int coid, Person person){
+	printf("SEND DISPLAY");
 	Display display;
 	display.output = *output;
 	display.person = person;
@@ -111,6 +112,7 @@ void sendDisplay(Output* output, int coid, Person person){
 }
 
 int* idle_handler(int coid, Person* person, Output* output) {
+	printf("IDLE HANDLER");
 	if (!strcmp(person->input, inMessage[LS])) {
 		person->direction = IN;
 		person->state = LEFT_SCAN_STATE;
@@ -130,6 +132,7 @@ int* idle_handler(int coid, Person* person, Output* output) {
 }
 
 int* left_scan_handler(int coid, Person* person, Output* output){
+	printf("LEFT SCAN HANDLER");
 	if (!strcmp(person->input, inMessage[GLU])) {
 		*output = GUARD_LEFT_UNLOCK;
 		person->state = GUARD_LEFT_UNLOCK_STATE;
@@ -142,6 +145,7 @@ int* left_scan_handler(int coid, Person* person, Output* output){
 }
 
 int* right_scan_handler(int coid, Person* person, Output* output) {
+	printf("RIGHT SCAN HANDLER");
 	if(!strcmp(person->input, inMessage[GRU])) {
 		*output = GUARD_RIGHT_UNLOCK;
 		person->state = GUARD_RIGHT_UNLOCK_STATE;
@@ -153,6 +157,7 @@ int* right_scan_handler(int coid, Person* person, Output* output) {
 }
 
 int* guard_left_unlock_handler(int coid, Person* person, Output* output) {
+	printf("GLL HANDLER");
 	if (!strcmp(person->input, inMessage[LO])) {
 		*output = LEFT_OPEN;
 		person->state = LEFT_OPEN_STATE;
@@ -161,9 +166,11 @@ int* guard_left_unlock_handler(int coid, Person* person, Output* output) {
 	} else {
 		//error
 		return guard_left_unlock_handler;
-
+	}
+}
 
 int* guard_right_unlock_handler(int coid, Person* person, Output* output) {
+	printf("GRL HANDLER");
 	if (!strcmp(person->input, inMessage[RO])) {
 		*output = RIGHT_OPEN;
 		person->state = RIGHT_OPEN_STATE;
@@ -177,6 +184,7 @@ int* guard_right_unlock_handler(int coid, Person* person, Output* output) {
 
 
 int* open_left_handler(int coid, Person* person, Output* output) {
+	printf("LO HANDLER");
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
 		person->state = WEIGHT_SCALE_STATE;
@@ -193,6 +201,7 @@ int* open_left_handler(int coid, Person* person, Output* output) {
 }
 
 int* open_right_handler(int coid, Person* person, Output* output){
+	printf("RO HANDLER");
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
 		person->state = WEIGHT_SCALE_STATE;
@@ -209,6 +218,7 @@ int* open_right_handler(int coid, Person* person, Output* output){
 }
 
 int* weight_handler(int coid, Person* person, Output* output) {
+	printf("WH HANDLER");
 	if (!strcmp(person->input, inMessage[WS]) && person->direction == IN) {
 		*output = WEIGHED;
 		person->state = GUARD_RIGHT_UNLOCK_STATE;
@@ -217,7 +227,7 @@ int* weight_handler(int coid, Person* person, Output* output) {
 	} else if (!strcmp(person->input, inMessage[WS]) && person->direction == OUT){
 		*output = WEIGHED;
 		person->state = GUARD_LEFT_UNLOCK_STATE;
-		sendDsiplay(output, coid, *person);
+		sendDisplay(output, coid, *person);
 		return right_close_handler;
 	} else{
 		//error
@@ -226,6 +236,7 @@ int* weight_handler(int coid, Person* person, Output* output) {
 }
 
 int* left_close_handler(int coid, Person* person, Output* output) {
+	printf("LC HANDLER");
 	if(!strcmp(person->input, inMessage[GLL])){
 		*output = GUARD_LEFT_LOCK;
 		person->state = GUARD_LEFT_LOCK_STATE;
@@ -237,6 +248,7 @@ int* left_close_handler(int coid, Person* person, Output* output) {
 }
 
 int* right_close_handler(int coid, Person* person, Output* output) {
+	printf("RC HANDLER");
 	if(!strcmp(person->input, inMessage[GRL])){
 		*output = GUARD_RIGHT_LOCK;
 		person-> state = GUARD_RIGHT_LOCK_STATE;
@@ -248,6 +260,7 @@ int* right_close_handler(int coid, Person* person, Output* output) {
 }
 
 int* guard_left_lock_handler(int coid, Person* person, Output* output) {
+	printf("GLL HANDLER");
     if(person->direction == OUT) {
         person->state = IDLE_STATE;
     	return idle_handler;
@@ -262,6 +275,7 @@ int* guard_left_lock_handler(int coid, Person* person, Output* output) {
 }
 
 int* guard_right_lock_handler(int coid, Person* person, Output* output) {
+	printf("GRL HANDLER");
     if(person->direction == IN) {
         person->state = IDLE_STATE;
     	return idle_handler;
@@ -280,8 +294,10 @@ int* guard_right_lock_handler(int coid, Person* person, Output* output) {
 }
 
 int* exit_handler(int coid, Person* person, Output* output) {
+	printf("EXIT HANDLER");
 		*output = EXIT;
 		sendDisplay(output, coid, *person);
-		exit(EXIT_SUCCESS);
+		return exit_handler;
 }
+
 
