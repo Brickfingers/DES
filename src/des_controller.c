@@ -91,15 +91,19 @@ int main(int argc, char* argv[]) {
 	exit(EXIT_SUCCESS);
 }
 
-int idle(int input, int coid, Display msg_send, Person person) {
-	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
+void sendDisplay(Output* output, int coid, int value){
+	display_t display;
+	display.output = *output;
+	if (MsgSend(coid, &display, size(display), NULL, 0)){
 		fprintf(stderr, "MsgSend had an error\n");
-		perror(EXIT_FAILURE);
+		perror(NULL);
 	}
-	if(state_table[person.state][input] != IS) {
-		return state_table[person.state][input];
+}
+
+int idle(int coid, Person* person, Input* input) {
+	if (strcmp(person->input, inMessage[0]) && strcmp(person->input, inMessage[1])) {
+		input =
 	}
-	return -1;
 }
 
 int left_scan(int input, int coid, Display msg_send, Person person){

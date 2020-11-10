@@ -21,7 +21,6 @@
 #include <unistd.h>
 
 #define NUM_STATES 13	// where n = number of states in your finite state machine (FSM)
-#define IS -1 //invalid state
 #define NUM_INPUTS 12	// where n equals the number of input commands that drive the FSM.
 //From the assignment specification, notice the prompt.
 //Each command, ls, rs, etc.
@@ -42,6 +41,11 @@ typedef enum State{
     GUARD_RIGHT_LOCK_STATE = 11,
 	EXIT_STATE = 12
 } State;
+
+typedef enum {
+	IN = 0,
+	OUT = 1
+} Direction;
 
 typedef enum {
 	//assign an enum value, one for each input command
@@ -113,10 +117,10 @@ typedef struct {
 	//what state the Person is in. Suppose the Person in
 	//"Left Scan" state. You need a way to represent that.
 	int id;
-	char input[64];
+	char* input;
 	int weight;
-	int direction;
-	int state;
+	Direction direction;
+	State state;
 } Person;
 
 // controller client sends a Display struct to its server, the display
@@ -127,24 +131,8 @@ typedef struct {
 	//in my messages. The Person field is needed, as some output
 	//message require information from the Person. Specifically,
 	//those messages that display the Person's ID and weight.
-	int output;
+	Output output;
 	Person person;
 } Display;
-
-int state_table[][NUM_STATES] = {
-    /*                           ls,  rs, glu, gru,  lo,  ro,  ws,  lc,  rc, gll, grl, exit*/
-    /* 0 IDLE               */ {  1,   2,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 1 LEFT_SCAN          */ { IS,  IS,   3,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 2 RIGHT_SCAN         */ { IS,  IS,  IS,   4,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 3 GUARD_LEFT_UNLOCK  */ { IS,  IS,  IS,  IS,   5,  IS,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 4 GUARD_RIGHT_UNLOCK */ { IS,  IS,  IS,  IS,  IS,   6,  IS,  IS,  IS,  IS,  IS,  12},
-    /* 5 LEFT_OPEN          */ { IS,  IS,  IS,  IS,  IS,  IS,   7,   8,  IS,  IS,  IS,  12},
-    /* 6 RIGHT_OPEN         */ { IS,  IS,  IS,  IS,  IS,  IS,   7,  IS,   9,  IS,  IS,  12},
-    /* 7 WEIGHT_SCALE       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,   8,   9,  IS,  IS,  12},
-    /* 8 LEFT_CLOSED        */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  IS,  12},
-    /* 9 RIGHT_CLOSED       */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,   0,  12},
-    /* 10 GUARD_LEFT_LOCK   */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
-    /* 11 GUARD_RIGHT_LOCK  */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS},
-    /* 12 EXIT              */ { IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS,  IS} };
 
 #endif /* DOOR_ENTRY_SYSTEM_H_ */
