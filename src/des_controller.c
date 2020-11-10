@@ -16,10 +16,25 @@ int main(int argc, char* argv[]) {
 
 	//des_inputs = client
 	Person person_message;
+	Output output;
 	int rcvid;
 	int chid;
 
-	StateFunc statefunc = idle_handler;
+	int* (*handler)(int coid, Person* person, Output* output) = {
+			idle_handler,
+			left_scan_handler,
+			right_scan_handler,
+			guard_left_unlock_handler,
+			guard_right_unlock_handler,
+			open_left_handler,
+			open_right_handler,
+			weight_handler,
+			left_close_handler,
+			right_close_handler,
+			guard_left_lock_handler,
+			guard_right_lock_handler,
+			exit_handler
+	};
 
 	//Phase I
 
@@ -53,18 +68,26 @@ int main(int argc, char* argv[]) {
 
 	while (1) {
 
+		//TODO - get input event from Person object and advance state machine to next accepting state (or error state)
+
+		if (person_message.state == IDLE_STATE){
+			printf("Waiting for Person...\n");
+		}
+
 		//get message
 		rcvid = MsgReceive(chid, &person_message, sizeof(person_message), NULL);
-
 		if (rcvid == -1) {
 			fprintf(stderr, "MsgReceive error.\n");
 			exit(EXIT_FAILURE);
 		}
+
+
+		if (!strcmp(&person_message.input, inMessage[EX])){
+			handler = &exit_handler;
+		}
+
+		handler = (*handler)(coid, &person_message, &output);
 		MsgReply(rcvid, EOK, NULL, 0);
-
-		//TODO - get input event from Person object and advance state machine to next accepting state (or error state)
-
-
 		//Reference - your CST8152 - Compiler notes (***)
 		// use function pointers
 		//TODO - complete rest of Phase II for controller
@@ -87,14 +110,16 @@ void sendDisplay(Output* output, int coid, Person person){
 	}
 }
 
-void* idle_handler(int coid, Person* person, Output* output) {
+int* idle_handler(int coid, Person* person, Output* output) {
 	if (!strcmp(person->input, inMessage[LS])) {
 		person->direction = IN;
+		person->state = LEFT_SCAN_STATE;
 		*output = ID_SCANNED;
 		sendDisplay(output, coid, *person);
 		return left_scan_handler;
 	} else if (!strcmp(person->input, inMessage[RS])) {
 		person->direction = OUT;
+		person->state = RIGHT_SCAN_STATE;
 		*output = ID_SCANNED;
 		sendDisplay(output, coid, *person);
 		return right_scan_handler;
@@ -104,9 +129,10 @@ void* idle_handler(int coid, Person* person, Output* output) {
 	}
 }
 
-void* left_scan_handler(int coid, Person* person, Output* output){
+int* left_scan_handler(int coid, Person* person, Output* output){
 	if (!strcmp(person->input, inMessage[GLU])) {
 		*output = GUARD_LEFT_UNLOCK;
+		person->state = GUARD_LEFT_UNLOCK_STATE;
 		sendDisplay(output, coid, *person);
 		return guard_left_unlock_handler;
 	} else {
@@ -118,16 +144,18 @@ void* left_scan_handler(int coid, Person* person, Output* output){
 int* right_scan_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[GRU])) {
 		*output = GUARD_RIGHT_UNLOCK;
-		sendDisplay(output, coid, person);
-		return guard_right_unlock;
+		person->state = GUARD_RIGHT_UNLOCK_STATE;
+		sendDisplay(output, coid, *person);
+		return guard_right_unlock_handler;
 	} else {
 		return right_scan_handler;
 	}
 }
 
-void* guard_left_unlock_handler(int coid, Person* person, Output* output) {
+int* guard_left_unlock_handler(int coid, Person* person, Output* output) {
 	if (!strcmp(person->input, inMessage[LO])) {
 		*output = LEFT_OPEN;
+		person->state = LEFT_OPEN_STATE;
 		sendDisplay(output, coid, *person);
 		return open_left_handler;
 	} else {
@@ -135,9 +163,10 @@ void* guard_left_unlock_handler(int coid, Person* person, Output* output) {
 		return guard_left_unlock_handler;
 
 
-void* guard_right_unlock_handler(int coid, Person* person, Output* output) {
+int* guard_right_unlock_handler(int coid, Person* person, Output* output) {
 	if (!strcmp(person->input, inMessage[RO])) {
 		*output = RIGHT_OPEN;
+		person->state = RIGHT_OPEN_STATE;
 		sendDisplay(output, coid, *person);
 		return open_right_handler;
 	} else {
@@ -147,42 +176,48 @@ void* guard_right_unlock_handler(int coid, Person* person, Output* output) {
 }
 
 
-void* open_left_handler(int coid, Person* person, Output* output) {
+int* open_left_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
-		sendDisplay(output, coid, person);
+		person->state = WEIGHT_SCALE_STATE;
+		sendDisplay(output, coid, *person);
 		return weight_handler;
 	} else if (!strcmp(person-> input, inMessage[LC])) {
 		*output = LEFT_CLOSE;
-		sendDisplay(output, coid, person);
+		person->state = LEFT_CLOSED_STATE;
+		sendDisplay(output, coid, *person);
 		return left_close_handler;
 	} else {
 		return open_left_handler;
 	}
 }
 
-void* open_right_handler(int coid, Person* person, Output* output){
+int* open_right_handler(int coid, Person* person, Output* output){
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
-		sendDisplay(output, coid, person);
+		person->state = WEIGHT_SCALE_STATE;
+		sendDisplay(output, coid, *person);
 		return weight_handler;
 	} else if (!strcmp(person-> input, inMessage[RC])) {
 		*output = RIGHT_CLOSE;
-		sendDisplay(output, coid, person);
+		person->state = RIGHT_CLOSED_STATE;
+		sendDisplay(output, coid, *person);
 		return right_close_handler;
 	} else {
 		return open_right_handler;
 	}
 }
 
-void* weight_handler(int coid, Person* person, Output* output) {
-	if (!strcmp(person->input, inMessage[WS]) && person.direction == IN) {
+int* weight_handler(int coid, Person* person, Output* output) {
+	if (!strcmp(person->input, inMessage[WS]) && person->direction == IN) {
 		*output = WEIGHED;
+		person->state = GUARD_RIGHT_UNLOCK_STATE;
 		sendDisplay(output, coid, *person);
 		return left_close_handler;
-	} else if (!strcmp(person->input, inMessage[WS]) && person.direction == OUT){
+	} else if (!strcmp(person->input, inMessage[WS]) && person->direction == OUT){
 		*output = WEIGHED;
-		sendDsiplay(output, coid, &person);
+		person->state = GUARD_LEFT_UNLOCK_STATE;
+		sendDsiplay(output, coid, *person);
 		return right_close_handler;
 	} else{
 		//error
@@ -190,10 +225,11 @@ void* weight_handler(int coid, Person* person, Output* output) {
 	}
 }
 
-void* left_close_handler(int coid, Person* person, Output* output) {
+int* left_close_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[GLL])){
 		*output = GUARD_LEFT_LOCK;
-		sendDisplay(output, coid, person);
+		person->state = GUARD_LEFT_LOCK_STATE;
+		sendDisplay(output, coid, *person);
 		return guard_left_lock_handler;
 	} else {
 		return left_close_handler;
@@ -203,49 +239,49 @@ void* left_close_handler(int coid, Person* person, Output* output) {
 int* right_close_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[GRL])){
 		*output = GUARD_RIGHT_LOCK;
-		sendDisplay(output, coid, person);
+		person-> state = GUARD_RIGHT_LOCK_STATE;
+		sendDisplay(output, coid, *person);
 		return guard_right_lock_handler;
 	} else {
 		return left_close_handler;
 	}
 }
 
-void* guard_left_lock_handler(int coid, Person* person, Output* output) {
-    if(person.direction == OUT) {
-        return idle_handler;
+int* guard_left_lock_handler(int coid, Person* person, Output* output) {
+    if(person->direction == OUT) {
+        person->state = IDLE_STATE;
+    	return idle_handler;
     } else if(!strcmp(person-> input, inMessage[GRU])) {
         *output = GUARD_RIGHT_UNLOCK;
-        sendDisplay(output, coid, person);
+        person->state = GUARD_RIGHT_UNLOCK_STATE;
+        sendDisplay(output, coid, *person);
         return guard_right_unlock_handler;
-    } else if (!strcmp(person -> input, inMessage[EX])){
-        *output = EXIT;
-        sendDisplay(output, coid, person);
-        return exit_handler;
     } else {
         return guard_left_lock_handler;
     }
 }
 
-void* guard_right_lock_handler(int coid, Person* person, Output* output) {
-    if(person.direction == IN) {
-        return idle_handler;
+int* guard_right_lock_handler(int coid, Person* person, Output* output) {
+    if(person->direction == IN) {
+        person->state = IDLE_STATE;
+    	return idle_handler;
     } else if(!strcmp(person-> input, inMessage[GLU])) {
         *output = GUARD_LEFT_UNLOCK;
-        sendDisplay(output, coid, person);
+        person->state = GUARD_LEFT_UNLOCK_STATE;
+        sendDisplay(output, coid, *person);
         return guard_left_unlock_handler;
     } else if (!strcmp(person -> input, inMessage[EX])){
         *output = EXIT;
-        sendDisplay(output, coid, person);
+        sendDisplay(output, coid, *person);
         return exit_handler;
     } else {
         return guard_right_lock_handler;
     }
 }
 
-void* exit_handler(int coid, Person* person, Output* output) {
-	if (!strcmp(person->input, inMessage[EX])) {
+int* exit_handler(int coid, Person* person, Output* output) {
 		*output = EXIT;
-		sendDisplay(output, coid, &person);
+		sendDisplay(output, coid, *person);
 		exit(EXIT_SUCCESS);
-	}
 }
+
