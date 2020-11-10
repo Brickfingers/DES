@@ -91,22 +91,40 @@ int main(int argc, char* argv[]) {
 	exit(EXIT_SUCCESS);
 }
 
-void sendDisplay(Output* output, int coid, int value){
-	display_t display;
+void sendDisplay(Output* output, int coid, Person* person){
+	Display display;
 	display.output = *output;
+	display.person = *person;
 	if (MsgSend(coid, &display, size(display), NULL, 0)){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(NULL);
 	}
 }
 
-int idle(int coid, Person* person, Input* input) {
-	if (strcmp(person->input, inMessage[0]) && strcmp(person->input, inMessage[1])) {
-		input =
+int* idle_handler(int coid, Person* person, Output* output) {
+	if (!strcmp(person->input, inMessage[LS])) {
+		person->direction = IN;
+		*output = ID_SCANNED;
+		sendDisplay(output, coid, &person);
+		return left_scan_handler;
+	} else if (!strcmp(person->input, inMessage[RS])) {
+		person->direction = OUT;
+		*output = ID_SCANNED;
+		sendDisplay(ouput, coid, &person);
+		return right_scan_handler;
+	} else {
+		//we could pass a error message for a wrong event
+		return idle;
 	}
 }
 
-int left_scan(int input, int coid, Display msg_send, Person person){
+int* left_scan_handler(int coid, Person* person, Output* output){
+	if (!strcmp(person->input, inMessage[GLU])) {
+		*output = GUARD_LEFT_UNLOCK;
+	}
+}
+
+int* right_scan_handler(int coid, Person* person, Output* output) {
 	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
 		fprintf(stderr, "MsgSend had an error\n");
 		perror(EXIT_FAILURE);
@@ -117,47 +135,43 @@ int left_scan(int input, int coid, Display msg_send, Person person){
 	return -1;
 }
 
-int right_scan(int input, int coid, Display msg_send, Person person) {
-	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
-		fprintf(stderr, "MsgSend had an error\n");
-		perror(EXIT_FAILURE);
-	}
-	if(state_table[person.state][input] != IS) {
-		return state_table[person.state][input];
-	}
-	return -1;
+int* guard_left_unlock_handler(int coid, Person* person, Output* output) {
+
 }
 
-int guard_left_unlock(int input, int coid, Display msg_send, Person person){
-	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
-		fprintf(stderr, "MsgSend had an error\n");
-		perror(EXIT_FAILURE);
-	}
-	if(state_table[person.state][input] != IS) {
-		return state_table[person.state][input];
-	}
-	return -1;
-}
+int* guard_right_unlock_handler(int coid, Person* person, Output* output) {
 
-int guard_right_unlock(int input, int coid, Display msg_send, Person person) {
-	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
-		fprintf(stderr, "MsgSend had an error\n");
-		perror(EXIT_FAILURE);
-	}
-	if(state_table[person.state][input] != IS) {
-		return state_table[person.state][input];
-	}
-	return -1;
 }
 
 
-int left_open(int input, int coid, Display msg_send, Person person){
-	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
-		fprintf(stderr, "MsgSend had an error\n");
-		perror(EXIT_FAILURE);
-	}
-	if(state_table[person.state][input] != IS) {
-		return state_table[person.state][input];
-	}
-	return -1;
+int* open_left_handler(int coid, Person* person, Output* output) {
+
+}
+
+int* open_right_handler(int coid, Person* person, Output* output){
+
+}
+
+int* weight_handler(int coid, Person* person, Output* output) {
+
+}
+
+int* left_close_handler(int coid, Person* person, Output* output) {
+
+}
+
+int* right_close_handler(int coid, Person* person, Output* output) {
+
+}
+
+int* guard_left_lock_handler(int coid, Person* person, Output* output) {
+
+}
+
+int* guard_right_unlock_handler(int coid, Person* person, Output* output) {
+
+}
+
+int* exit_handler(int coid, Person* person, Output* output) {
+
 }

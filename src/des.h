@@ -53,7 +53,7 @@ typedef enum {
 	RS = 1,
 	GLU = 2,
 	GRU = 3,
-	LLO = 4,
+	LO = 4,
 	RO = 5,
 	WS = 6,
 	LC = 7,
@@ -82,7 +82,7 @@ const char *inMessage[NUM_INPUTS] = {
 #define NUM_OUTPUTS 11	// where n equals the number of output messages from the FSM.
 typedef enum {
 	//assign an enum value, one for each output message from the FSM
-	ID_SCAN = 0,
+	ID_SCANNED = 0,
 	GUARD_LEFT_UNLOCK = 1,
 	GUARD_RIGHT_UNLOCK = 2,
 	LEFT_OPEN = 3,
@@ -134,5 +134,19 @@ typedef struct {
 	Output output;
 	Person person;
 } Display;
+
+int* idle_handler(int coid, Person* person, Output* output);
+int* left_scan_handler(int coid, Person* person, Output* output);
+int* right_scan_handler(int coid, Person* person, Output* output);
+int* guard_left_unlock_handler(int coid, Person* person, Output* output);
+int* guard_right_unlock_handler(int coid, Person* person, Output* output);
+int* open_left_handler(int coid, Person* person, Output* output);
+int* open_right_handler(int coid, Person* person, Output* output);
+int* weight_handler(int coid, Person* person, Output* output);
+int* left_close_handler(int coid, Person* person, Output* output);
+int* right_close_handler(int coid, Person* person, Output* output);
+int* guard_left_lock_handler(int coid, Person* person, Output* output);
+int* guard_right_unlock_handler(int coid, Person* person, Output* output);
+int* exit_handler(int coid, Person* person, Output* output);
 
 #endif /* DOOR_ENTRY_SYSTEM_H_ */
