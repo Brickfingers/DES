@@ -128,6 +128,7 @@ int* right_scan_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[GRU])) {
 		*output = GUARD_RIGHT_UNLOCK;
 		sendDisplay(output, coid, person);
+		return guard_right_unlock
 	} else {
 		return right_scan_handler;
 	}
@@ -146,9 +147,11 @@ int* open_left_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
 		sendDisplay(output, coid, person);
+		return weight_handler;
 	} else if (!strcmp(person-> input, inMessage[LC])) {
 		*output = LEFT_CLOSE;
 		sendDisplay(output, coid, person);
+		return left_close_handler;
 	} else {
 		return open_left_handler;
 	}
@@ -158,9 +161,11 @@ int* open_right_handler(int coid, Person* person, Output* output){
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
 		sendDisplay(output, coid, person);
+		return weight_handler;
 	} else if (!strcmp(person-> input, inMessage[RC])) {
 		*output = RIGHT_CLOSE;
 		sendDisplay(output, coid, person);
+		return right_close_handler;
 	} else {
 		return open_right_handler;
 	}
@@ -171,15 +176,33 @@ int* weight_handler(int coid, Person* person, Output* output) {
 }
 
 int* left_close_handler(int coid, Person* person, Output* output) {
+	if(!strcmp(person->input, inMessage[GLL])){
+		*output = GUARD_LEFT_LOCK;
+		sendDisplay(output, coid, person);
+		return guard_left_lock_handler;
+	} else {
+		return left_close_handler;
+	}
 
 }
 
 int* right_close_handler(int coid, Person* person, Output* output) {
-
+	if(!strcmp(person->input, inMessage[GRL])){
+		*output = GUARD_RIGHT_LOCK;
+		sendDisplay(output, coid, person);
+		return guard_right_lock_handler;
+	} else {
+		return left_close_handler;
+	}
 }
 
 int* guard_left_lock_handler(int coid, Person* person, Output* output) {
-
+	if(!strcmp(person-> input, inMessage[EX])) {
+		*output = EXIT;
+		sendDisplay(output, coid, person);
+	} else {
+		return guard_left_lock_handler;
+	}
 }
 
 int* guard_right_unlock_handler(int coid, Person* person, Output* output) {
