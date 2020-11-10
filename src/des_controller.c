@@ -105,16 +105,16 @@ int* idle_handler(int coid, Person* person, Output* output) {
 	if (!strcmp(person->input, inMessage[LS])) {
 		person->direction = IN;
 		*output = ID_SCANNED;
-		sendDisplay(output, coid, &person);
+		sendDisplay(output, coid, person);
 		return left_scan_handler;
 	} else if (!strcmp(person->input, inMessage[RS])) {
 		person->direction = OUT;
 		*output = ID_SCANNED;
-		sendDisplay(ouput, coid, &person);
+		sendDisplay(ouput, coid, person);
 		return right_scan_handler;
 	} else {
 		//we could pass a error message for a wrong event
-		return idle;
+		return idle_handler;
 	}
 }
 
@@ -125,14 +125,12 @@ int* left_scan_handler(int coid, Person* person, Output* output){
 }
 
 int* right_scan_handler(int coid, Person* person, Output* output) {
-	if (MsgSend(coid, &msg_send, sizeof(msg_send), NULL, 0) == -1){
-		fprintf(stderr, "MsgSend had an error\n");
-		perror(EXIT_FAILURE);
+	if(!strcmp(person->input, inMessage[GRU])) {
+		*output = GUARD_RIGHT_UNLOCK;
+		sendDisplay(output, coid, person);
+	} else {
+		return right_scan_handler;
 	}
-	if(state_table[person.state][input] != IS) {
-		return state_table[person.state][input];
-	}
-	return -1;
 }
 
 int* guard_left_unlock_handler(int coid, Person* person, Output* output) {
@@ -145,11 +143,27 @@ int* guard_right_unlock_handler(int coid, Person* person, Output* output) {
 
 
 int* open_left_handler(int coid, Person* person, Output* output) {
-
+	if(!strcmp(person->input, inMessage[WS])){
+		*output = WEIGHED;
+		sendDisplay(output, coid, person);
+	} else if (!strcmp(person-> input, inMessage[LC])) {
+		*output = LEFT_CLOSE;
+		sendDisplay(output, coid, person);
+	} else {
+		return open_left_handler;
+	}
 }
 
 int* open_right_handler(int coid, Person* person, Output* output){
-
+	if(!strcmp(person->input, inMessage[WS])){
+		*output = WEIGHED;
+		sendDisplay(output, coid, person);
+	} else if (!strcmp(person-> input, inMessage[RC])) {
+		*output = RIGHT_CLOSE;
+		sendDisplay(output, coid, person);
+	} else {
+		return open_right_handler;
+	}
 }
 
 int* weight_handler(int coid, Person* person, Output* output) {
