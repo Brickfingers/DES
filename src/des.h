@@ -135,18 +135,20 @@ typedef struct {
 	Person person;
 } Display;
 
-int* idle_handler(int coid, Person* person, Output* output);
-int* left_scan_handler(int coid, Person* person, Output* output);
-int* right_scan_handler(int coid, Person* person, Output* output);
-int* guard_left_unlock_handler(int coid, Person* person, Output* output);
-int* guard_right_unlock_handler(int coid, Person* person, Output* output);
-int* open_left_handler(int coid, Person* person, Output* output);
-int* open_right_handler(int coid, Person* person, Output* output);
-int* weight_handler(int coid, Person* person, Output* output);
-int* left_close_handler(int coid, Person* person, Output* output);
-int* right_close_handler(int coid, Person* person, Output* output);
-int* guard_left_lock_handler(int coid, Person* person, Output* output);
-int* guard_right_unlock_handler(int coid, Person* person, Output* output);
-int* exit_handler(int coid, Person* person, Output* output);
+typedef void* (*StateFunc)(int, Person*, Output*);
+
+void* idle_handler(int coid, Person* person, Output* output);
+void* left_scan_handler(int coid, Person* person, Output* output);
+void* right_scan_handler(int coid, Person* person, Output* output);
+void* guard_left_unlock_handler(int coid, Person* person, Output* output);
+void* guard_right_unlock_handler(int coid, Person* person, Output* output);
+void* open_left_handler(int coid, Person* person, Output* output);
+void* open_right_handler(int coid, Person* person, Output* output);
+void* weight_handler(int coid, Person* person, Output* output);
+void* left_close_handler(int coid, Person* person, Output* output);
+void* right_close_handler(int coid, Person* person, Output* output);
+void* guard_left_lock_handler(int coid, Person* person, Output* output);
+void* guard_right_unlock_handler(int coid, Person* person, Output* output);
+void* exit_handler(int coid, Person* person, Output* output);
 
 #endif /* DOOR_ENTRY_SYSTEM_H_ */
