@@ -119,7 +119,7 @@ int* right_scan_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[GRU])) {
 		*output = GUARD_RIGHT_UNLOCK;
 		sendDisplay(output, coid, person);
-		return guard_right_unlock
+		return guard_right_unlock;
 	} else {
 		return right_scan_handler;
 	}
@@ -147,7 +147,7 @@ void* guard_right_unlock_handler(int coid, Person* person, Output* output) {
 }
 
 
-int* open_left_handler(int coid, Person* person, Output* output) {
+void* open_left_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
 		sendDisplay(output, coid, person);
@@ -161,7 +161,7 @@ int* open_left_handler(int coid, Person* person, Output* output) {
 	}
 }
 
-int* open_right_handler(int coid, Person* person, Output* output){
+void* open_right_handler(int coid, Person* person, Output* output){
 	if(!strcmp(person->input, inMessage[WS])){
 		*output = WEIGHED;
 		sendDisplay(output, coid, person);
@@ -191,10 +191,6 @@ void* weight_handler(int coid, Person* person, Output* output) {
 }
 
 void* left_close_handler(int coid, Person* person, Output* output) {
-
-}
-
-int* left_close_handler(int coid, Person* person, Output* output) {
 	if(!strcmp(person->input, inMessage[GLL])){
 		*output = GUARD_LEFT_LOCK;
 		sendDisplay(output, coid, person);
@@ -202,7 +198,6 @@ int* left_close_handler(int coid, Person* person, Output* output) {
 	} else {
 		return left_close_handler;
 	}
-
 }
 
 int* right_close_handler(int coid, Person* person, Output* output) {
@@ -215,13 +210,36 @@ int* right_close_handler(int coid, Person* person, Output* output) {
 	}
 }
 
-int* guard_left_lock_handler(int coid, Person* person, Output* output) {
-	if(!strcmp(person-> input, inMessage[EX])) {
-		*output = EXIT;
-		sendDisplay(output, coid, person);
-	} else {
-		return guard_left_lock_handler;
-	}
+void* guard_left_lock_handler(int coid, Person* person, Output* output) {
+    if(person.direction == OUT) {
+        return idle_handler;
+    } else if(!strcmp(person-> input, inMessage[GRU])) {
+        *output = GUARD_RIGHT_UNLOCK;
+        sendDisplay(output, coid, person);
+        return guard_right_unlock_handler;
+    } else if (!strcmp(person -> input, inMessage[EX])){
+        *output = EXIT;
+        sendDisplay(output, coid, person);
+        return exit_handler;
+    } else {
+        return guard_left_lock_handler;
+    }
+}
+
+void* guard_right_lock_handler(int coid, Person* person, Output* output) {
+    if(person.direction == IN) {
+        return idle_handler;
+    } else if(!strcmp(person-> input, inMessage[GLU])) {
+        *output = GUARD_LEFT_UNLOCK;
+        sendDisplay(output, coid, person);
+        return guard_left_unlock_handler;
+    } else if (!strcmp(person -> input, inMessage[EX])){
+        *output = EXIT;
+        sendDisplay(output, coid, person);
+        return exit_handler;
+    } else {
+        return guard_right_lock_handler;
+    }
 }
 
 void* exit_handler(int coid, Person* person, Output* output) {
